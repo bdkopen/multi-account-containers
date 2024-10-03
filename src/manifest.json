@@ -51,6 +51,12 @@
       },
       "description": "__MSG_sortTabsByContainer__"
     },
+    "hide_container_0": {
+        "suggested_key": {
+            "default": "Ctrl+Alt+1"
+        },
+        "description": "__MSG_containerShortcut__"
+    },
     "open_container_0": {
       "suggested_key": {
         "default": "Ctrl+Shift+1"

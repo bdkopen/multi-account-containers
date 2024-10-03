@@ -15,9 +15,23 @@ const backgroundLogic = {
   unhideQueue: [],
   init() {
 
-    browser.commands.onCommand.addListener(function (command) {
+    browser.commands.onCommand.addListener(function (command, tab) {
       if (command === "sort_tabs") {
         backgroundLogic.sortTabs();
+        return;
+      }
+
+      if(command.includes("hide_container_")) {
+        console.log("Hiding container");
+
+        // get the chrome window id for the current window
+        const windowId = tab.windowId;
+        const cookieStoreId =  identityState.keyboardShortcut["open_container_0"];
+
+        console.log(windowId);
+        console.log(cookieStoreId);
+
+        backgroundLogic.toggleTabs({cookieStoreId, windowId});
         return;
       }
 
@@ -386,6 +400,32 @@ const backgroundLogic = {
         });
       }
     });
+  },
+
+  async toggleTabs(options) {
+    const requiredArguments = ["cookieStoreId", "windowId"];
+    this.checkArgs(requiredArguments, options, "hideTabs");
+    const { cookieStoreId, windowId } = options;
+
+    const containerState = await identityState.storageArea.get(cookieStoreId);
+
+    console.log(containerState);
+
+
+    const hasHiddenTabs=containerState.hiddenTabs.some((tab)=> tab.hiddenState === true);
+
+    if(hasHiddenTabs) {
+      await this.showTabs({
+        cookieStoreId,
+        // alreadyShowingUrl: options.alreadyShowingUrl
+      });
+    } else {
+      await this.hideTabs({
+        cookieStoreId,
+        windowId
+      });
+    }
+
   },
 
   async hideTabs(options) {
